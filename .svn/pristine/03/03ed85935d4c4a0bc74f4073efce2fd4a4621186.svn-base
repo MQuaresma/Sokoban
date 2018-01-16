@@ -1,0 +1,132 @@
+module Main where
+
+import qualified Data.Text as T
+import Data.List
+import Data.Char
+
+inStr :: String -> [String]
+inStr [] = []
+inStr ['\n'] = [[],[]]
+inStr (x:xs) = case x of
+    '\n' -> []:inStr xs
+    otherwise -> case inStr xs of
+        y:ys -> (x:y):ys
+        [] -> [[x]]
+
+outStr :: [String] -> String
+outStr [] = "\n"
+outStr t = unlines (map (T.unpack . T.stripEnd . T.pack) t)
+
+main = do inp <- getContents
+          putStr (outStr (tarefa2 (inStr inp)))
+
+tarefa2 :: [String] -> [String]
+tarefa2 linhas = colocaTudo (reverse (simplificaMapa (reverse tab) todas (reverse tab))) coordenadasF
+	where
+		(tab, coordenadas) = dividemapa linhas
+		coordenadasF = processacoordenadas (removeInv coordenadas)
+		todas = recolheCords 0 0 tab
+
+-- |Separa as coordenadas do tabuleiro/mapa
+dividemapa :: [String] -> ([String], [String]) 
+dividemapa [] = ([], [])
+dividemapa l = splitAt (aux l) l
+	where 
+		aux :: [String] -> Int
+		aux [] = 0
+		aux (x:xs) = if(aux2 x) then 1 + aux xs else 0  
+		
+		aux2 :: String -> Bool
+		aux2 [] = False
+		aux2 (x:xs) = if(ord x == 35) then True else aux2 xs  
+							
+-- | Devolve umm caracter dado um mapa e coordenadas
+devolveCarater :: (Int, Int) -> [String] -> Char
+devolveCarater crd mp = percorreLinhas mp crd 0
+	where
+		percorreLinhas :: [String] -> (Int,Int) -> Int -> Char
+		percorreLinhas [] _ n = '#'
+		percorreLinhas (h:t) (p1, p2) n = if(p2 == n) then percorreColunas h p1 0
+										              else percorreLinhas t (p1, p2) (n+1)
+		
+		percorreColunas :: String -> Int -> Int -> Char
+		percorreColunas [] _ n = '#'
+		percorreColunas (x:xs) p1 n |p1 == n = x 
+								  	|otherwise = percorreColunas xs p1 (n+1)
+
+removeDeLinha :: String-> [(Int, Int)]-> [String] -> String
+removeDeLinha [] _ _ = []
+removeDeLinha (h:t) (x:xs) tab |devolveCarater x tab == ' ' = ' ' : removeDeLinha t xs tab
+						   	   |devolveCarater x tab == '.' = '.' : removeDeLinha t xs tab
+							   |(devolveCarater (l1, l2 + 1) tab == ' ' || devolveCarater (l1 + 1, l2) tab == ' ' || devolveCarater (l1, l2 - 1) tab == ' ' || devolveCarater (l1 - 1, l2) tab == ' ' || devolveCarater (l1 + 1, l2 + 1) tab == ' ' || devolveCarater (l1 - 1, l2 - 1) tab == ' ' || devolveCarater (l1 - 1, l2 + 1) tab == ' ' || devolveCarater (l1 + 1, l2 - 1) tab == ' ') = '#' :  removeDeLinha t xs tab
+							   |(devolveCarater (l1, l2 + 1) tab == '.' || devolveCarater (l1 + 1, l2) tab == '.' || devolveCarater (l1, l2 - 1) tab == '.' || devolveCarater (l1 - 1, l2) tab == '.' || devolveCarater (l1 + 1, l2 + 1) tab == '.' || devolveCarater (l1 - 1, l2 - 1) tab == '.' || devolveCarater (l1 - 1, l2 + 1) tab == '.' || devolveCarater (l1 + 1, l2 - 1) tab == '.') = '#' :  removeDeLinha t xs tab
+							   |(devolveCarater (l1, l2 + 1) tab == '#' && devolveCarater (l1 + 1, l2) tab == '#' && devolveCarater (l1, l2 - 1) tab == '#' && devolveCarater (l1 - 1, l2) tab == '#' && devolveCarater (l1 + 1, l2 + 1) tab == '#' && devolveCarater (l1 - 1, l2 - 1) tab == '#' && devolveCarater (l1 - 1, l2 + 1) tab == '#' && devolveCarater (l1 + 1, l2 - 1) tab == '#') = ' ' :  removeDeLinha t xs tab
+	where
+		(l1, l2) = x
+
+simplificaMapa :: [String] -> [(Int, Int)] -> [String] -> [String]
+simplificaMapa [] _ _ = []
+simplificaMapa (h:t) cds tab = removeDeLinha h cds tab : simplificaMapa t (drop (length h) cds) tab
+
+-- |Recolhe as coordenadas de todos os caracteres do mapa					  
+recolheCords :: Int -> Int -> [String] -> [(Int, Int)]
+recolheCords _ _ [] = []
+recolheCords c l (x:xs) = (aux c l x) ++ recolheCords c (l+1) xs
+	where
+		aux :: Int -> Int -> String -> [(Int, Int)]
+		aux c l  [] = []
+		aux c l (h:t) = (c, l) : aux (c+1) l t
+
+-- |Coloca o boneco no mapa
+colocaBoneco :: [String] -> (Int,Int) -> [String]
+colocaBoneco l (x,y) = reverse (percorreLinhas (reverse l) (x,y)) 
+	where
+		percorreLinhas :: [String] -> (Int, Int) -> [String]
+		percorreLinhas (h:t) (p1, p2) = if(p2 == 0) then ((percorreColunas h  p1) : t) else (h : percorreLinhas t (p1, p2 - 1)) 
+
+		percorreColunas :: String -> Int -> String
+		percorreColunas [] _ = []
+		percorreColunas (z:zs) n = if(n == 0) then 'o' : zs else (z : percorreColunas zs (n-1))
+
+-- |Coloca uma caixa no mapa
+colocaCaixa :: [String] -> (Int,Int) -> [String]
+colocaCaixa l (x,y) = reverse (percorreLinhas (reverse l) (x,y)) 
+	where
+		percorreLinhas :: [String] -> (Int, Int) -> [String]
+		percorreLinhas (h:t) (p1, p2) = if(p2 == 0) then ((percorreColunas h  p1) : t) else (h : percorreLinhas t (p1, p2 - 1)) 
+
+		percorreColunas :: String -> Int -> String
+		percorreColunas [] _ = []
+		percorreColunas (z:zs) n = if(n == 0) then if(z == '.') then 'I' : zs 
+																else 'H' : zs 
+											  else (z : percorreColunas zs (n-1))
+
+
+-- |Chama a função coloca caixa para colocar todas as caixas no mapa
+colocaCaixas :: [String] -> [(Int, Int)] -> [String]
+colocaCaixas l [z] = colocaCaixa l z 
+colocaCaixas l (h:t) = colocaCaixas (colocaCaixa l h) t 
+
+-- |Coloca o boneco e as caixas no mapa
+colocaTudo :: [String] -> [(Int, Int)] -> [String]
+colocaTudo l (h:t) = colocaBoneco (colocaCaixas l t) h
+
+
+processacoordenadas :: [String] -> [(Int, Int)]
+processacoordenadas [] = []
+processacoordenadas (h:t) = (read x, read y) : processacoordenadas t 
+		where
+			[x, y] = words h
+
+-- |Remove as coordenadas inválidas
+removeInv :: [String] -> [String]
+removeInv [] = []
+removeInv (x:xs) | x==""= removeInv xs
+                 | length (words x) /= 2 = removeInv xs
+                 | remaux x == False = removeInv xs
+                 | otherwise = x : removeInv xs
+
+remaux :: String -> Bool
+remaux [] = True
+remaux (h:t) = if isDigit h || h == ' ' then remaux t else False
+

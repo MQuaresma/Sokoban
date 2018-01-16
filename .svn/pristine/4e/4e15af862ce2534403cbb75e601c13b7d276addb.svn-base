@@ -1,0 +1,236 @@
+{-|
+Module : Main
+Descrição : Módulo de Haskell referente à quarta tarefa do projeto de LI.
+Copyright : Miguel Quaresma <miguelquaresma97@gmail.com>
+			João Nogueira
+
+-}
+
+module Main where
+
+import qualified Data.Text as T
+import Data.List
+import Data.Char
+import System.Directory
+
+main = do inp <- getContents
+          putStr (outStr (tarefa4 (inStr inp)))
+
+
+inStr :: String -> [String]
+inStr [] = []
+inStr ['\n'] = [[],[]]
+inStr (x:xs) = case x of
+    '\n' -> []:inStr xs
+    otherwise -> case inStr xs of
+        y:ys -> (x:y):ys
+        [] -> [[x]]
+
+outStr :: [String] -> String
+outStr [] = "\n"
+outStr t = unlines (map (T.unpack . T.stripEnd . T.pack) t)
+
+tarefa4 :: [String] -> [String]
+tarefa4 linhas = [(inCompleto h mapaF muv)  ++ show(devolveFinal h muv mapaF)]
+	where
+		(parte1, parte2) = dividemapa linhas
+		cords = processacoordenadas (removeInv parte2) -- Remove o caracter referente ao movimento e devolve as coordenadas
+		h = head cords -- Devolve as coordenadas do boneco
+		t = tail cords -- Devolve as coordenadas das caixas
+		muv = last (removeV parte2) 
+		mapaF = colocaCaixas parte1 t -- Devolve o mapa com as caixas colocadas facilitando assim a verificação referente ao movimento do boneco
+
+
+-- | Corre todos os testes de um determinado diretório automaticamente, recorrendo à função correTeste
+correTestes :: IO ()
+correTestes = do
+      files4 <- getDirectoryContents "/home/miguel/Documentos/Disciplinas/Laboratórios_de_Informática/li1g030/tests/T4/"
+      let inputs4 = map ("/home/miguel/Documentos/Disciplinas/Laboratórios_de_Informática/li1g030/tests/T4/" ++) $ filter (isSuffixOf ".in") files4 
+      mapM_ (correTeste tarefa4) inputs4
+
+
+-- | Corre um teste e compara o resultado obtido com o esperado
+correTeste :: ([String] -> [String]) -> String -> IO ()
+correTeste tarefa input = do
+    -- nome do ficheiro
+    let nome = reverse $ drop 3 $ reverse input
+    -- texto do mapa
+    inp <- readFile input
+    -- resultado da tarefa
+    let o = outStr (tarefa (inStr inp))
+    -- resultado esperado
+    esp <- readFile (nome ++ ".out")
+    putStr ("[" ++ nome ++ "]: ")
+    if (o == esp)   -- compara resultados
+    then putStrLn "OK"
+    else do
+        putStrLn "FALHOU"
+        putStr esp
+        putStrLn o
+
+
+
+
+-- | Separa o tabuleiro das coordenadas e da letra referente ao movimento do boneco
+dividemapa :: [String] -> ([String], [String]) 
+dividemapa [] = ([], [])
+dividemapa l = splitAt (aux l) l
+	where 
+		aux :: [String] -> Int
+		aux [] = 0
+		aux (x:xs) = if(aux2 x) then 1 + aux xs else 0  
+		
+		aux2 :: String -> Bool
+		aux2 [] = False
+		aux2 (x:xs) = if(ord x == 35) then True else aux2 xs
+
+-- | Devolve FIM ou INCOMPLETO caso o mapa esteja completo ou incompleto respetivamente
+inCompleto :: (Int, Int) -> [String] -> String -> String
+inCompleto cb mp muvs = if(mapaCompleto (recolheCords mp muvs cb) mp == contaCaixas mp) then "FIM " else "INCOMPLETO "
+
+
+-- | Devolve as coordenadas finais do boneco, variando estas consoante o movimento pretendido seja válido ou não
+devolveFinal :: (Int, Int) -> String -> [String] -> Int
+devolveFinal _ [] _ = 0
+devolveFinal cb (h:t) mp = if(movimentoValido mp h (z1, z2)) then 1 + devolveFinal (z1, z2) t mp else devolveFinal cb t mp	
+	where
+		(z1, z2) = move cb h
+		(x1, x2) = cb
+		xs = show x1
+		ys = show x2
+		z = show z1
+		zs = show z2
+
+-- | Verifica se o movimento é valido
+movimentoValido :: [String] -> Char -> (Int,Int) -> Bool
+movimentoValido tab c par = percorreLinhas (reverse tab) par 
+	where
+		final = podeMexerCaixa (reverse tab) c par 
+		percorreLinhas :: [String] -> (Int,Int) -> Bool
+		percorreLinhas [] _ = False
+		percorreLinhas (h:t) (p1, p2) |p2 == 0 = percorreColunas h p1
+									  |otherwise = percorreLinhas t (p1, p2 - 1)
+		
+		percorreColunas :: String -> Int -> Bool
+		percorreColunas [] _  = False
+		percorreColunas (x:xs) p1 |p1 == 0 = if(x == 'I' || x == 'H') then final 
+											 else if(x == '#') then False 
+											 	  else True
+								  |otherwise = percorreColunas xs (p1 - 1)
+
+
+-- | Consoante o caracter presente no fim do ficheiro devolve a coordenada resultante de mover o boneco nessa direção
+move :: (Int,Int) -> Char -> (Int, Int)
+move (l1, l2) c |c == 'U' = (l1 , l2 + 1)
+				|c == 'D' = (l1 , l2 - 1)
+				|c == 'L' = (l1 - 1  , l2)
+				|c == 'R' = (l1 + 1  , l2)
+				|otherwise = (l1, l2)
+
+-- | Coloca as caixas no tabuleiro, facilitando assim a validação do movimento do boneco
+colocaCaixas :: [String] -> [(Int, Int)] -> [String]
+colocaCaixas l [] = l
+colocaCaixas l [z] = colocaCaixa l z 
+colocaCaixas l (h:t) = colocaCaixas (colocaCaixa l h) t 
+
+-- | Função auxiliar da função __colocaCaixas__ que coloca cada caixa individualmente
+colocaCaixa :: [String] -> (Int,Int) -> [String]
+colocaCaixa l (x,y) = reverse (percorreLinhas (reverse l) (x,y)) 
+	where
+		percorreLinhas :: [String] -> (Int, Int) -> [String]
+		percorreLinhas (h:t) (p1, p2) = if(p2 == 0) then ((percorreColunas h  p1) : t) else (h : percorreLinhas t (p1, p2 - 1)) 
+
+		percorreColunas :: String -> Int -> String
+		percorreColunas [] _ = []
+		percorreColunas (z:zs) n = if(n == 0) then if(z == '.') then 'I' : zs 
+																else 'H' : zs 
+											  else (z : percorreColunas zs (n-1))
+
+
+-- | Verifica se a caixa que o boneco está a empurrar se pode mexer na direção pretendida
+podeMexerCaixa :: [String] -> Char -> (Int, Int) -> Bool
+podeMexerCaixa tab c cx = percorreLinhas tab nextMove
+	where
+		nextMove = move cx c
+		percorreLinhas :: [String] -> (Int,Int) -> Bool
+		percorreLinhas [] _ = False
+		percorreLinhas (h:t) (p1, p2) = if(p2 == 0) then percorreColunas h p1
+										else percorreLinhas t (p1, p2 - 1)
+		
+		percorreColunas :: String -> Int -> Bool
+		percorreColunas [] _ = False
+		percorreColunas (x:xs) p1 |p1 == 0 = if(x == '#' || x == 'I' || x == 'H') then False else True
+								  |otherwise = percorreColunas xs (p1 - 1)
+
+
+-- | Conta o número de pontos (.) no mapa obtendo assim o número de caixas esperadas 
+contaCaixas :: [String] -> Int 
+contaCaixas [] = 0
+contaCaixas (h:t) = aux h + contaCaixas t
+	where 
+		aux :: String -> Int
+		aux [] = 0
+		aux (h:t) = if(ord h == 46) then 1 + aux t else aux t 
+
+-- |Verifica se todas as caixas estão nas posições finais
+mapaCompleto :: [(Int, Int)] -> [String] -> Int
+mapaCompleto [] _ = 0
+mapaCompleto (h:t) mp = if(percorreLinhas (reverse mp) h 0 == '.') then 1 + mapaCompleto t mp else mapaCompleto t mp
+	where
+		percorreLinhas :: [String] -> (Int,Int) -> Int -> Char
+		percorreLinhas [] _ n = '#'
+		percorreLinhas (h:t) (p1, p2) n |p2 == n = percorreColunas h p1 0
+										|otherwise = percorreLinhas t (p1, p2) (n+1)
+		
+		percorreColunas :: String -> Int -> Int -> Char
+		percorreColunas [] _ n = '#'
+		percorreColunas (x:xs) p1 n |p1 == n = x 
+								  	|otherwise = percorreColunas xs p1 (n+1)
+
+-- | Recolhe as coords finais das caixas
+recolheCords :: [String] -> String -> (Int, Int) -> [(Int, Int)]
+recolheCords _  [] _ = []
+recolheCords mp (h:t) cb |movimentoValido mp h muv = if(percorreLinhas (reverse mp) muv 0 == 'H' || percorreLinhas (reverse mp) muv 0 == 'I') then if(podeMexerCaixa (reverse mp) h muv) then cordNova : recolheCords mpNovo t muv 
+																																							                             else recolheCords mp t cb
+																																			  else recolheCords mp t muv   
+						 |otherwise = recolheCords mp t cb
+	where				
+		muv = move cb h
+		cordNova = move muv h
+		mpNovo = colocaCaixa mp cordNova
+		percorreLinhas :: [String] -> (Int,Int) -> Int -> Char
+		percorreLinhas [] _ n = '#'
+		percorreLinhas (h:t) (p1, p2) n |p2 == n = percorreColunas h p1 0
+										|otherwise = percorreLinhas t (p1, p2) (n+1)
+		
+		percorreColunas :: String -> Int -> Int -> Char
+		percorreColunas [] _ n = '#'
+		percorreColunas (x:xs) p1 n |p1 == n = x 
+								  	|otherwise = percorreColunas xs p1 (n+1)
+
+
+
+-- | Converte a lista de coordenadas, ainda em lista de /strings/, numa lista de pares de /Int/s  
+processacoordenadas :: [String] -> [(Int, Int)]
+processacoordenadas [] = []
+processacoordenadas (h:t) = (read x, read y) : processacoordenadas t 
+		where
+			[x, y] = words h -- Separa os elementos de uma /string/ através dos espaços existentes entre eles e coloca-os numa lista
+
+-- | Remove a coordenadas inválidas (com um so nro; com caracteres que não são nros ou linhas vazias)
+removeInv :: [String] -> [String]
+removeInv [] = []
+removeInv (x:xs) | x==""= removeInv xs
+                 | length (words x) /= 2 = removeInv xs
+                 | remaux x == False = removeInv xs
+                 | otherwise = x : removeInv xs
+
+remaux :: String -> Bool
+remaux [] = True
+remaux (h:t) = if isDigit h || h == ' ' then remaux t else False 
+
+-- | Remove as linhas vazias da segunda parte do mapa, eliminando possíveis erros de execução
+removeV :: [String] -> [String]
+removeV []= []
+removeV (x:xs) |x == "" = removeV xs
+			   |otherwise = x : removeV xs

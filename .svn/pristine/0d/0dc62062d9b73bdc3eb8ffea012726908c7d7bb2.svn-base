@@ -1,0 +1,56 @@
+import Data.Char
+
+leMapa :: String -> IO ()
+leMapa file = do
+	content <- readFile file
+	let mapa = processMapa content
+	putStr $ verificaMapa (fst mapa)
+
+type Mapa = ([String], [(Int,Int)])
+
+processMapa :: String -> Mapa
+processMapa conteudo = (arrecadacao, coordenadas)
+	where
+		linhas = lines conteudo
+		tamanhoArrecadacao = 11
+		(arrecadacao, posicoes) = splitAt tamanhoArrecadacao linhas
+		coordenadas = map processaPosicoes posicoes
+
+processaPosicoes :: String -> (Int,Int)
+processaPosicoes linha = (read x, read y)
+	where
+		[x,y] = words linha
+
+
+verificaMapa :: [String] -> String
+verificaMapa l = if((verificaInterior l) && (headCheck l) && (tailCheck l) && (verificarLados l)) then "OK" else "error"
+
+
+verificaInterior :: [String] -> Bool
+verificaInterior [] = True
+verificaInterior (h:t) = if(aux1 h) then verificaInterior t else False 
+	where 
+		aux1 :: String -> Bool
+		aux1 [] = True
+		aux1 (x:xs) = if(ord x == 32 || ord x == 46 || ord x == 35) then aux1 xs else False
+
+headCheck :: [String] -> Bool
+headCheck (h:t) = aux h
+	where
+		aux :: String -> Bool
+		aux [] = True
+		aux (x:xs) = if(ord x == 35) then aux xs else False
+
+tailCheck :: [String] -> Bool
+tailCheck (h:t) = aux2 h
+	where
+		aux2 :: String -> Bool
+		aux2 [] = True
+		aux2 (x:xs) = if(ord x == 35) then aux2 xs else False
+
+verificarLados :: [String] -> Bool
+verificarLados [] = True
+verificarLados (h:t) = if(aux3 h) then verificarLados t else False
+	where
+		aux3 :: String -> Bool
+		aux3 l = if(ord (head l) == 35 && ord (last l) == 35) then True else False

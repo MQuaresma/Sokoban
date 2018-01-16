@@ -1,0 +1,64 @@
+import Data.Char
+
+leMapa :: String -> IO ()
+leMapa file = do
+	content <- readFile file
+	let mapa = processMapa content
+	putStr $ verificaMapa (fst mapa)
+
+type Mapa = ([String], [(Int,Int)])
+
+processMapa :: String -> Mapa
+processMapa conteudo = (arrecadacao, coordenadas)
+	where
+		linhas = lines conteudo
+		tamanhoArrecadacao = 11
+		(arrecadacao, posicoes) = splitAt tamanhoArrecadacao linhas
+		coordenadas = map processaPosicoes posicoes
+
+processaPosicoes :: String -> (Int,Int)
+processaPosicoes linha = (read x, read y)
+	where
+		[x,y] = words linha
+
+
+verificaMapa :: [String] -> String
+verificaMapa l = if((verificaInterior l) && (headCheck l) && (lastCheck l) && (verificarLados l) && (testacomprimento l)) then "OK" else "error"
+
+
+verificaInterior :: [String] -> Bool --verifica se ha algum caracter do mapa que não seja "." , "#", " "
+verificaInterior [] = True
+verificaInterior (h:t) = if(aux1 h) then verificaInterior t else False 
+	where 
+		aux1 :: String -> Bool
+		aux1 [] = True
+		aux1 (x:xs) = if(ord x == 32 || ord x == 46 || ord x == 35) then aux1 xs else False
+
+
+--
+headCheck :: [String] -> Bool --verifica se todos os caracteres da primeira linha sao cardinais (#)
+headCheck (h:t) = aux h
+	where
+		aux :: String -> Bool
+		aux [] = True
+		aux (x:xs) = if(ord x == 35) then aux xs else False
+
+lastCheck :: [String] -> Bool
+lastCheck t = aux (last t)
+	where
+		aux :: String -> Bool
+		aux [] = True
+		aux (x:xs) = if(ord x == 35) then aux xs else False
+
+verificarLados :: [String] -> Bool --verifica se os contornos laterais são 
+verificarLados [] = True
+verificarLados (h:t) = if(aux3 h) then verificarLados t else False
+	where
+		aux3 :: String -> Bool
+		aux3 l = if(ord (head l) == 35 && ord (last l) == 35) then True else False
+
+
+testacomprimento :: [String] -> Bool
+testacomprimento [x] = True
+testacomprimento (x:xs) |length x == length (head xs) = testacomprimento xs
+						|otherwise = False

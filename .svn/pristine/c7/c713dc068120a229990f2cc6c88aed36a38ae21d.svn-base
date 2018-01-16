@@ -1,0 +1,76 @@
+\documentclass[a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[portuges]{babel}
+\usepackage{a4wide}
+
+\title{Projeto de Laboratórios de Informática 1\\Grupo xx}
+\author{Autor1 (número) \and Autor2 (número)}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Este documento apresenta uma possível estrutura e sugestões de conteúdo para o relatório do projeto de Laboratórios de Informática 1 (LI1), da Licenciatura em Engenharia Informática da Universidade do Minho. 
+
+O \emph{resumo} dum relatório deve sumarizar, em não mais que dois parágrafos, o trabalho desenvolvido e o relatório em questão, incluindo o problema a resolver, os resultados obtidos e as conclusões.
+\end{abstract}
+
+\tableofcontents
+
+\section{Introdução}
+\label{sec:intro}
+
+Este documento apresenta uma possível estrutura para o relatório da 2ª fase do projeto da disciplina de Laboratórios de Informática 1 (LI1), da Licenciatura em Engenharia Informática da Universidade do Minho, que toma a forma de um projeto de média dimensão a ser desenvolvido na linguagem de programação funcional Haskell.
+
+Nesse contexto, este relatório deve relatar o trabalho desenvolvido pelos alunos para atingir o resultado final nesse projeto, devendo acompanhar a submissão da solução implementada. Além de servir de treino das capacidades de comunicação escrita dos estudantes, servirá também como elemento de avaliação para a utilização de \LaTeX{} pelos alunos. Sendo assim o código fonte \LaTeX{} do relatório deve ser mantido no repositório \texttt{svn} atribuído ao grupo\footnote{A ficha de LI1 dedicada ao \LaTeX{} disponibiliza informação técnica adicional sobre a utilização desta ferramenta.}. Um relatório desta natureza tem geralmente uma dimensão entre 4 e 8 páginas, para além de eventuais anexos.
+
+A \emph{introdução} de um relatório apresenta de modo geral o trabalho descrito no relatório: o problema que se pretende resolver, a sua contextualização e a abordagem proposta pelos alunos para o resolver. Deve passar ao leitor não só uma perspetiva geral do trabalho desenvolvido mas também a motivação por trás dele.
+
+Esta secção termina normalmente com uma apresentação da estrutura do relatório, sendo aqui apresentada uma sugestão. Neste caso, a Secção~\ref{sec:problema} descreve o problema a resolver enquanto a Secção~\ref{sec:solucao} apresenta e discute a solução proposta pelos alunos. O relatório termina com conclusões na Secção~\ref{sec:conclusao}, onde é também apresentada uma análise crítica dos resultados obtidos.
+
+\section{Descrição do Problema}
+\label{sec:problema}
+
+No âmbito da apredizagem da linguagem de programação (funcional) Haskell, este projeto tem como intuito principal o desenvolvimento de um jogo semelhante ao presente em \textit {Sokoban.info}. Para tal o projeto encontra-se dividido em duas fases, cada uma compreendendo três tarefas de seguida enumeradas:	 
+	\begin{enumerate}
+		\item Tarefa 1 - Validação de um Mapa (recebido na forma de ficheiro de texto)
+		\item Tarefa 2 - Simplificação do mapa e colocação do boneco e das caixas 
+		\item Tarefa 3 - Validação de um movimento por parte de um boneco e \textbf{output} do resultado
+		\item Tarefa 4 - Execução de uma sequência de movimentos
+		\item Tarefa 5 - Cálculo da área (envolvente) de uma \textbf{Picture}
+		\item Tarefa 6 - Desenvolvimento da interfae gráfica e compilação de todas as tarefas anteriores 
+	\end{enumerate}
+Sendo assim, é na última tarefa acima mencionada que o jogo "ganha vida", sendo que esta tarefa avaliada não só pela mecânica do jogo mas também pela criatividade da mesma.
+
+
+\section{Concepção da Solução}
+\label{sec:solucao}
+
+Esta secção deve descrever o trabalho efetivamente desenvolvido pelos alunos para resolver o problema apresentado na secção anterior. Segue-se uma sugestão de organização para esta secção.
+
+\subsection{Estruturas de Dados}
+
+As estruturas de dados, como o próprio nome indica, são a forma principal de armazenar e manipular dados,tendo por isso um papel fulcral no trabalho. Destas destacam-se:
+	\begin{description}
+		\item [\textbf {Strings}] Sendo exemplo destas o conteúdo dos ficheiro de texto contendo os mapas
+		\item [\textbf {[(Float, Float)]} / \textbf {[(Int, Int)]}] Usados no armazenamento de coordenadas
+		\item [\textbf {Pictures}] Estrutura de dados responsável pela composição da interface gráfica
+	\end{description}
+Esta secção deve apresentar as \emph{estruturas de dados} mais relevantes para a solução desenvolvida.
+	
+\subsection{Implementação}
+
+Esta secção deve apresentar as soluções propostas pelos alunos para atingir os objetivos propostos, assim como a sua \emph{implementação}, devendo também descrever os problemas encontrados e as decisões tomadas para os ultrapassar. Apesar de poder conter excertos de código fonte quando relevante, esta secção não deve servir como alternativa à documentação do código fonte submetido.
+
+\subsection{Testes}
+
+Esta secção deve apresentar alguns dos \emph{testes} definidos pelos alunos para testar as funcionalidades da solução desenvolvida.
+
+\section{Conclusões}
+\label{sec:conclusao}
+
+A secção de \emph{conclusões} resume o restante documento, devendo também apresentar uma análise crítica dos resultados atingidos tendo em conta os objetivos definidos.
+
+\end{document}

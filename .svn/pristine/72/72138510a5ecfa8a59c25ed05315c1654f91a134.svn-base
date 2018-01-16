@@ -1,0 +1,96 @@
+module Main where
+
+import Data.Char
+import qualified Data.Text as T
+
+{-main = do
+	inp <- getContents
+	putStr $ outStr $ verificaTudo $ dividemapa ( inStr inp)-}
+
+
+teste:: String -> IO ()
+teste file = do
+	content <- readFile file
+	putStr (verificaTudo (dividemapa (inStr content)))
+
+
+verificaMapa :: [String] -> Int 
+verificaMapa (h:t) = if(contornosCheck h) then if(verificaInterior 2 (take (length t - 1) t) == 0) then if(contornosCheck (last t) && length (last t) == length h) then 0
+																												else length (h:t)
+										  	   								  					   else verificaInterior 2 (take (length t - 1) t)           					 
+					 else 1
+
+inStr :: String -> [String]
+inStr [] = []
+inStr ['\n'] = [[],[]]
+inStr (x:xs) = case x of
+    '\n' -> []:inStr xs
+    otherwise -> case inStr xs of
+        y:ys -> (x:y):ys
+        [] -> [[x]]
+
+outStr :: [String] -> String
+outStr [] = "\n"
+outStr t = unlines (map (T.unpack . T.stripEnd . T.pack) t)
+
+{-tarefa1 :: [String] -> [String]
+tarefa1 linhas = [verificaMapa linhas]-}
+
+
+verificaInterior :: Int -> [String] -> Int --verifica se ha algum caracter do mapa que não seja "." , "#", " "
+verificaInterior _ [] = 0
+verificaInterior n (h:t) = if(aux1 h && verificarLados h) then verificaInterior (n+1) t else n 
+	where 
+		aux1 :: String -> Bool
+		aux1 [] = True
+		aux1 (x:xs) = if(ord x == 32 || ord x == 46 || ord x == 35) then aux1 xs else False
+
+
+verificaComprimento :: Int -> [String] -> Int
+verificaComprimento n [x,y] = if(length x == length y) then 0 else n
+verificaComprimento n (h:x:t) = if(length h == length x) then verificaComprimento (n+1) (x:t) else n
+
+comparaErros :: [String] -> Int --compara as linhas onde ha erros e devolve a linha que vem primeiro
+comparaErros l = min (verificaComprimento 2 l) (verificaMapa l) 
+
+
+contornosCheck :: String -> Bool --verifica se todos os caracteres da primeira linha sao cardinais (#)
+contornosCheck [] = True
+contornosCheck (x:xs) = if(ord x == 35) then contornosCheck xs else False
+
+
+verificarLados :: String -> Bool --verifica se os contornos laterais são 
+verificarLados (h:t) = if(ord h == 35 && ord (last t) == 35) then True else False
+
+verificaCoordenadas :: Int -> [(Int, Int)] -> Int --verifica as coordenadas ja em forma de inteiros
+verificaCoordenadas n [] = 0
+verificaCoordenadas n (x:xs) = if(l1 > 0 && l2 > 0) then verificaCoordenadas (n+1) xs else n
+	where
+		(l1, l2) = x
+
+
+dividemapa :: [String] -> ([String], [String]) --separa o tabuleiro das coordenadas
+dividemapa [] = ([], [])
+dividemapa l = splitAt (aux l) l
+	where 
+		aux :: [String] -> Int
+		aux [] = 0
+		aux (x:xs) = if(aux2 x) then 1 + aux xs else 0  
+		
+		aux2 :: String -> Bool
+		aux2 [] = False
+		aux2 (x:xs) = if(ord x == 35) then True else aux2 xs  
+
+processacoordenadas :: [String] -> [(Int, Int)] --transforma as coordenadas em inteiros
+processacoordenadas [] = []
+processacoordenadas (h:t) = (read x, read y) : processacoordenadas t
+	where
+		[x,y] = words h 
+
+verificaTudo :: ([String], [String]) -> String  --faz check de tudo ao mesmo tempo e devolve a linha onde há erro
+verificaTudo l = if(comparaErros (fst l) == 0) then if(verificaCoordenadas lncd nro == 0) then "OK\n" 
+																						  else show (verificaCoordenadas lncd nro)  
+											   else show (comparaErros (fst l))
+				where
+					nro = processacoordenadas $ snd l
+					lncd = (length (fst l)) + 1

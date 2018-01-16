@@ -1,0 +1,57 @@
+import Data.Char
+
+leMapa :: String -> IO ()
+leMapa file = do
+	content <- readFile file
+	let mapa = processMapa content
+	putStr $ verificaMapa (fst mapa)
+
+type Mapa = ([String], [(Int,Int)])
+
+processMapa :: String -> Mapa
+processMapa conteudo = (arrecadacao, coordenadas)
+	where
+		linhas = lines conteudo
+		tamanhoArrecadacao = 11
+		(arrecadacao, posicoes) = splitAt tamanhoArrecadacao linhas
+		coordenadas = map processaPosicoes posicoes
+
+processaPosicoes :: String -> (Int,Int)
+processaPosicoes linha = (read x, read y)
+	where
+		[x,y] = words linha
+
+
+verificaMapa :: [String] -> Int
+verificaMapa [x] = if(contornosCheck x) then 0 else 
+verificaMapa (h:t) = if(contornosCheck h) then if(verificaInterior 2 l1 == 0) then verificaMapa (last t) 
+										  	   								  else verificaInterior 2 l1                --adicionar forma de contar a linha onde está o erro
+					 
+					 else 1
+	where
+		l1 = take (length t - 1) t
+
+
+verificaInterior :: Int -> [String] -> Int --verifica se ha algum caracter do mapa que não seja "." , "#", " "
+verificaInterior _ [] = 0
+verificaInterior n (h:t) = if(aux1 h) then verificaInterior (n+1) t else n 
+	where 
+		aux1 :: String -> Bool
+		aux1 [] = True
+		aux1 (x:xs) = if(ord x == 32 || ord x == 46 || ord x == 35) then aux1 xs else False
+
+
+--
+contornosCheck :: String -> Bool --verifica se todos os caracteres da primeira linha sao cardinais (#)
+contornosCheck [] = True
+contornosCheck (x:xs) = if(ord x == 35) then contornosCheck xs else False
+
+
+verificarLados :: String -> Bool --verifica se os contornos laterais são 
+verificarLados (h:t) = if(ord h == 35 && ord (last t) == 35) then True else False
+
+
+{-testacomprimento :: [String] -> Bool
+testacomprimento [x] = True
+testacomprimento (x:xs) |length x == length (head xs) = testacomprimento xs
+						|otherwise = False-}

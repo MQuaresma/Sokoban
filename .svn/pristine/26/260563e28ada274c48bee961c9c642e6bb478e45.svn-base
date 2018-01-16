@@ -1,0 +1,17 @@
+\relax 
+\catcode `"\active 
+\select@language{portuges}
+\@writefile{toc}{\select@language{portuges}}
+\@writefile{lof}{\select@language{portuges}}
+\@writefile{lot}{\select@language{portuges}}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Introdu\IeC {\c c}\IeC {\~a}o}{1}}
+\newlabel{sec:intro}{{1}{1}}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Descri\IeC {\c c}\IeC {\~a}o do Problema}{2}}
+\newlabel{sec:problema}{{2}{2}}
+\@writefile{toc}{\contentsline {section}{\numberline {3}Concep\IeC {\c c}\IeC {\~a}o da Solu\IeC {\c c}\IeC {\~a}o}{2}}
+\newlabel{sec:solucao}{{3}{2}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Estruturas de Dados}{2}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Implementa\IeC {\c c}\IeC {\~a}o}{2}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Testes}{2}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Conclus\IeC {\~o}es}{2}}
+\newlabel{sec:conclusao}{{4}{2}}

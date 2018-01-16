@@ -1,0 +1,38 @@
+import Data.Char
+
+leMapa :: String -> IO ()
+leMapa file = do
+	content <- readFile file
+	let mapa = processMapa content
+	putStr $ verificarmapa (fst mapa)
+
+type Mapa = ([String], [(Int,Int)])
+
+processMapa :: String -> Mapa
+processMapa conteudo = (arrecadacao, coordenadas)
+	where
+		linhas = lines conteudo
+		tamanhoArrecadacao = 11
+		(arrecadacao, posicoes) = splitAt tamanhoArrecadacao linhas
+		coordenadas = map processaPosicoes posicoes
+
+processaPosicoes :: String -> (Int,Int)
+processaPosicoes linha = (read x, read y)
+	where
+		[x,y] = words linha
+
+
+verificarmapa :: [String] -> Int
+verificarmapa [] = 0
+verificarmapa (h:t) = if(aux h) then verificarmapa t else 
+	where 
+		aux :: String -> Bool
+		aux [] = True
+		aux (x:xs) = if(ord x == 32 || ord x == 46 || ord x == 35) then aux xs else False
+
+mapacheck :: Int -> String
+mapacheck x = if(x == 0) then "OK" else x 
+
+
+--verificarcontornos :: [String] -> String
+--verificarcontornos l1 =  
