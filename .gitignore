@@ -10,3 +10,8 @@
 ## Haskell
 **/*.hi
 **/*.o
+.stack-work/**
+
+
+## Others
+build/**

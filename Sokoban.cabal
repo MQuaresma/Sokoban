@@ -4,7 +4,7 @@ version:             0.1.0.0
 -- description:
 homepage:            https://github.com/MQuaresma/Sokoban#readme
 license:             MIT
-license-file:        LICENSE
+license-file:        LICENSE.md
 author:              Miguel Miranda Quaresma
 maintainer:          miguelquaresma97@gmail.com
 copyright:           2018 Miguel Miranda Quaresma

@@ -34,6 +34,7 @@ type Coordenadas = (Float, Float)
 -- * Imagem de congratulação
 type Mapa = ((Float,Float),Coordenadas,[Coordenadas], [Coordenadas], [Coordenadas], (Int, String), Picture, Picture, Picture, Picture, String, Picture)
 
+assets_prefix="../assets/"
 
 main :: IO ()
 main = do 
@@ -41,12 +42,12 @@ main = do
         escolha <- getLine --permite ao utilizador escolher o boneco que deseja
         putStrLn "Escolha um mapa (mapa1/mapa2/mapa3): "
         mapa <- getLine --permite ao utilziador escolher o mapa que deseja
-        boneco <- loadBMP ("../Recursos/" ++ escolha ++ ".bmp") -- carrega a imagem da boneco
-        caixa <- loadBMP ("../Recursos/" ++ escolha ++ "Crate.bmp") -- carega a imagem das caixas
-        ficheiroMapa <- readFile ("../Recursos/" ++ mapa ++ ".txt") -- carega o ficheiro que contem o mapa
-        parede <- loadBMP "../Recursos/paredeF.bmp" -- carega a imagem das paredes
-        caixasF <- loadBMP "../Recursos/dot.bmp" -- carega a imagem das posições finais das caixas
-        fim <- loadBMP "../Recursos/theEnd.bmp" -- carega a imagem de congratulação após o fim do jogo
+        boneco <- loadBMP (assets_prefix ++ "game/" ++ escolha ++ ".bmp") -- carrega a imagem da boneco
+        caixa <- loadBMP (assets_prefix ++ "game/" ++ escolha ++ "Crate.bmp") -- carega a imagem das caixas
+        ficheiroMapa <- readFile (assets_prefix ++ "maps/" ++ mapa ++ ".txt") -- carega o ficheiro que contem o mapa
+        parede <- loadBMP "../assets/game/paredeF.bmp" -- carega a imagem das paredes
+        caixasF <- loadBMP "../assets/game/dot.bmp" -- carega a imagem das posições finais das caixas
+        fim <- loadBMP "../assets/game/theEnd.bmp" -- carega a imagem de congratulação após o fim do jogo
         gameManager boneco caixa parede caixasF "Incompleto" "Movimentos: " ficheiroMapa fim
             
 
