@@ -38,17 +38,17 @@ assets_prefix="../assets/"
 
 main :: IO ()
 main = do 
-        putStrLn "Escolha um boneco (homer/marge/lisa/bart): "
-        escolha <- getLine --permite ao utilizador escolher o boneco que deseja
-        putStrLn "Escolha um mapa (mapa1/mapa2/mapa3): "
-        mapa <- getLine --permite ao utilziador escolher o mapa que deseja
-        boneco <- loadBMP (assets_prefix ++ "game/" ++ escolha ++ ".bmp") -- carrega a imagem da boneco
-        caixa <- loadBMP (assets_prefix ++ "game/" ++ escolha ++ "Crate.bmp") -- carega a imagem das caixas
-        ficheiroMapa <- readFile (assets_prefix ++ "maps/" ++ mapa ++ ".txt") -- carega o ficheiro que contem o mapa
-        parede <- loadBMP "../assets/game/paredeF.bmp" -- carega a imagem das paredes
-        caixasF <- loadBMP "../assets/game/dot.bmp" -- carega a imagem das posições finais das caixas
-        fim <- loadBMP "../assets/game/theEnd.bmp" -- carega a imagem de congratulação após o fim do jogo
-        gameManager boneco caixa parede caixasF "Incompleto" "Movimentos: " ficheiroMapa fim
+        putStrLn "Choose a hero (homer/marge/lisa/bart): "
+        hero <- getLine
+        putStrLn "Choose a map (mapa1/mapa2/mapa3): "
+        map <- getLine
+        character <- loadBMP $ assets_prefix ++ "game/" ++ hero ++ ".bmp"
+        crate <- loadBMP $ assets_prefix ++ "game/" ++ hero ++ "Crate.bmp"
+        map_file <- readFile $ assets_prefix ++ "maps/" ++ map ++ ".txt"
+        walls <- loadBMP "../assets/game/paredeF.bmp"
+        placeholder <- loadBMP "../assets/game/dot.bmp"
+        end <- loadBMP "../assets/game/theEnd.bmp"
+        gameManager character crate walls placeholder "Incompleto" "Movimentos: " map_file end
             
 
 
@@ -70,7 +70,7 @@ gameManager boneco caixa parede caixasF estadoMp score mapaF fim = joga mapaInit
 -- | Função que cria um jogo.
 joga :: mundo -> (mundo -> Picture) -> (Event -> mundo -> mundo) -> IO ()
 joga mapaInicial desenha reage = play
-    (InWindow "Sokoban" (1280, 720) (0, 0)) -- Tamanho da janela do jogo
+    (InWindow "Sokoban" (500, 500) (0, 0)) -- Tamanho da janela do jogo
     (white) -- Côr do fundo da janela
     45 -- refresh rate
     mapaInicial -- mapa inicial
@@ -112,19 +112,10 @@ desenhaMapa ((xMapa,yMapa),(x,y), coordsCaixas, coordsParedes, coordsF, (moves, 
         
 
 
-{--- | Lê os scores obtidos
-processaScores :: [String] -> [Int]
-processaScores [] = []
-processaScores (h:t) = (read h) : processaScores t-}
-
 -- | Reage a diversos eventos
 reageManager :: Mapa -> [Mapa] -> Event -> Mapa -> Mapa
 reageManager mapaInit _ (EventKey (Char 'r') Up _ _) mapa = mapaInit --reinicia o mapa caso o utilizador pressiona a tecla r
---reageManager _ (h:t) (EventKey (Char 'a') Up _ _) mapa = h --TODO: retroceder movimentos
 reageManager mapaInit _ tecla mapa = reageEvento tecla mapa 
-
-
-
 
 -- | Move a boneco uma coordenada para o lado
 moveBoneco :: (Float,Float) -> Mapa -> Mapa
@@ -185,8 +176,7 @@ reageEvento _ mapa = mapa -- ignora qualquer outro evento
 
 -- | Não reage ao passar do tempo.
 reageTempo :: Float -> mundo -> mundo
-reageTempo t m = m
-
+reageTempo _ m = m
 
 -- | Devolve as coords de um determinado um objeto após se movimentar
 move :: (Float,Float) -> Char -> (Float, Float)
