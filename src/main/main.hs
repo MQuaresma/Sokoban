@@ -59,10 +59,10 @@ gameManager boneco caixa parede caixasF estadoMp score mapaF fim = joga mapaInit
         (h:t) = tabuleiro 
         (tabuleiro, coords) = dividemapa (inStr mapaF)
         ((x1,x2):xs) = map (\(x,y) -> (fromIntegral x, fromIntegral y)) (processacoordenadas (removeInv coords)) --coordenadas fornecidas no ficheiro de texto
-        coordsCaixas = map (*40) (map (+1) xs) --coordenadas das caixas
+        coordsCaixas = map (\(x,y) -> (x*40, y*40)) (map (\(x,y)->(x+1, y+1)) xs) --coordenadas das caixas
         tabuleiroSimples = reverse (tarefa2 (inStr mapaF)) --mapa simplificado
-        coordsParedes = map (*40) (recolheParedes tabuleiroSimples 1) --coordenadas dos locais de colocação das paredes
-        coordsF =  map (*40) (recolhePosF tabuleiroSimples 1) --coordenadas do local de arrumação das caixas
+        coordsParedes = map (\(x,y) -> (x*40, y*40)) (recolheParedes tabuleiroSimples 1) --coordenadas dos locais de colocação das paredes
+        coordsF =  map (\(x,y) -> (x*40, y*40)) (recolhePosF tabuleiroSimples 1) --coordenadas do local de arrumação das caixas
         mapaInit = (dim ,((x1+1) *40, (x2+1) *40), coordsCaixas , coordsParedes, coordsF, (0, score), boneco, caixa, parede, caixasF, estadoMp, fim) --estado inicial do mapa
 
 
