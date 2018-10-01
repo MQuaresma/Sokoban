@@ -1,7 +1,13 @@
 ## macOS
-.DS_Store
+**/.DS_Store
+**/._*
 
-._*
-*.txt
-*.pdf
-**/*.swp
+## Latex
+**/*.toc
+**/*.log
+**/*.aux
+**/*.tex
+
+## Haskell
+**/*.hi
+**/*.o
