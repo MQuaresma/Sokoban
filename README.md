@@ -10,8 +10,7 @@ Project proposed as an assignment for the Computer Labs I course at Universidade
 
 ## Setup
 ### Dependencies
-- [Gloss]()
-- []()
+- [Gloss](https://hackage.haskell.org/package/gloss-1.10.2.5/docs/Graphics-Gloss.html)
 
 ### Build
 

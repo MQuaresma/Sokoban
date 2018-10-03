@@ -15,5 +15,6 @@
 
 
 ## Development/Deployment
-- [ ] Installation script
+- [x] Installation script
+- [ ] Improve installation script
 - [ ] Unit testing
