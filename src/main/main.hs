@@ -32,7 +32,7 @@ type Coordenadas = (Float, Float)
 -- * Indicador do estado do mapa
 -- * Background do nro de movimentos
 -- * Imagem de congratulação
-type Mapa = ((Float,Float),Coordenadas,[Coordenadas], [Coordenadas], [Coordenadas], (Int, String), Picture, Picture, Picture, Picture, String, Picture)
+type GameStatus = ((Float,Float),Coordenadas,[Coordenadas], [Coordenadas], [Coordenadas], (Int, String), Picture, Picture, Picture, Picture, String, Picture)
 
 assets_prefix="../assets/"
 
@@ -79,7 +79,7 @@ joga mapaInicial desenha reage = play
     reageTempo -- função que reage ao passar do tempo 
 
 -- | Desenha o jogo dentro da janela
-desenhaMapa :: Mapa -> Picture
+desenhaMapa :: GameStatus -> Picture
 desenhaMapa ((xMapa,yMapa),(x,y), coordsCaixas, coordsParedes, coordsF, (moves, score), boneco, caixa, paredes, caixasF, estadoMp, fim) | listaFinal coordsCaixas coordsF = Pictures [borda, tabuleiro, final] 
                                                                                                                                         | otherwise = Pictures [borda,tabuleiro, Pictures(colocaPosF coordsF caixasF), figura, Pictures(colocaCaixas coordsCaixas caixa), Pictures(colocaParedes coordsParedes paredes), estadoMap, pontos]
     where
@@ -118,7 +118,7 @@ processaScores [] = []
 processaScores (h:t) = (read h) : processaScores t-}
 
 -- | Reage a diversos eventos
-reageManager :: Mapa -> [Mapa] -> Event -> Mapa -> Mapa
+reageManager :: GameStatus -> [GameStatus] -> Event -> GameStatus -> GameStatus
 reageManager mapaInit _ (EventKey (Char 'r') Up _ _) mapa = mapaInit --reinicia o mapa caso o utilizador pressiona a tecla r
 --reageManager _ (h:t) (EventKey (Char 'a') Up _ _) mapa = h --TODO: retroceder movimentos
 reageManager mapaInit _ tecla mapa = reageEvento tecla mapa 
@@ -127,7 +127,7 @@ reageManager mapaInit _ tecla mapa = reageEvento tecla mapa
 
 
 -- | Move a boneco uma coordenada para o lado
-moveBoneco :: (Float,Float) -> Mapa -> Mapa
+moveBoneco :: (Float,Float) -> GameStatus -> GameStatus
 moveBoneco (x,y) mapa | listaFinal coordsCaixas coordsF = fim
                       | otherwise = continua
     where
@@ -139,7 +139,7 @@ moveBoneco (x,y) mapa | listaFinal coordsCaixas coordsF = fim
 
 
 -- | Reage ao pressionar das setas do teclado, movendo a bola 5 pixéis numa direção
-reageEvento :: Event -> Mapa -> Mapa
+reageEvento :: Event -> GameStatus -> GameStatus
 reageEvento (EventKey (SpecialKey KeyUp)    Down _ _) mapa  |testa = if(elem movimento coordsCaixas) then moveBoneco (0,40) mapaNovo else  moveBoneco (0,40)  mapaMv  
                                                             |otherwise = mapa
     where
@@ -342,11 +342,11 @@ dividemapa l = splitAt (aux l) l
     where 
         aux :: [String] -> Int
         aux [] = 0
-        aux (x:xs) = if(aux2 x) then 1 + aux xs else 0  
+        aux (x:xs) = if(isWall x) then 1 + aux xs else 0  
         
-        aux2 :: String -> Bool
-        aux2 [] = False
-        aux2 (x:xs) = if(ord x == 35) then True else aux2 xs  
+        isWall :: String -> Bool
+        isWall [] = False
+        isWall (x:xs) = (ord x == 35) || isWall xs
 
 
 -- | Converte a lista de coordenadas, ainda em lista de /strings/, numa lista de pares de /Int/s 
