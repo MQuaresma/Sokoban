@@ -20,6 +20,7 @@ Project proposed as an assignment for the Computer Labs I course at Universidade
 - [ ] Go-back in-game functionality 
 - [ ] Local leaderboard
 - [ ] Map builder tool(?)
+- [ ] Solver
 
 ## License
 Licensed under the MIT License, see [LICENSE.md](License.md) for more details.
